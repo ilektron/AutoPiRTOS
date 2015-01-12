@@ -129,10 +129,10 @@ static void prvI2CTask( void *pvParameters )
 			gyro_temp = gyro_get_temp();
 			gyro_read_rates((int16_t*)&gyro_x0, (int16_t*)&gyro_y0, (int16_t*)&gyro_z0);
 
-			// Convert gyro readings to float
-			gyro_x0f = (float)(gyro_x0)/(float)(0x7FFF)*GYRO_SCALE;
-			gyro_y0f = (float)(gyro_y0)/(float)(0x7FFF)*GYRO_SCALE;
-			gyro_z0f = (float)(gyro_z0)/(float)(0x7FFF)*GYRO_SCALE;
+			// Convert gyro readings to float (Degrees per Second)
+			gyro_x0f = (float)(gyro_x0)/(float)(0x7FFF) * GYRO_SCALE / 180.0f * 3.141592653589f;
+			gyro_y0f = (float)(gyro_y0)/(float)(0x7FFF) * GYRO_SCALE/ 180.0f * 3.141592653589f;
+			gyro_z0f = (float)(gyro_z0)/(float)(0x7FFF) * GYRO_SCALE/ 180.0f * 3.141592653589f;
 
 			//Low pass filter gyro raw values
 			gyro_x0f = gyro_x1 + i2cGYRO_LOW_PASS_ALPHA * (gyro_x0f - gyro_x1);
@@ -161,9 +161,13 @@ static void prvI2CTask( void *pvParameters )
 			// Update the attitude estimate
 			quaternion_update_with_rates(gyro_x0f, gyro_y0f, gyro_z0f, &attitude, dt);
 
-//			gyro_x_pos1 = gyro_x_pos0;
-//			gyro_y_pos1 = gyro_y_pos0;
-//			gyro_z_pos1 = gyro_z_pos0;
+			gyro_x_pos0 = quaternion_to_roll(&attitude) * 180 / 3.14159;
+			gyro_y_pos0 = quaternion_to_pitch(&attitude) * 180 / 3.14159;
+			gyro_z_pos0 = quaternion_to_yaw(&attitude) * 180 / 3.14159;
+
+			gyro_x_pos1 = gyro_x_pos0;
+			gyro_y_pos1 = gyro_y_pos0;
+			gyro_z_pos1 = gyro_z_pos0;
 
 		}
 

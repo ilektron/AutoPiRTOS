@@ -551,6 +551,8 @@ void updateGains(void)
 		pid_set_gain(&(pids[PID_PITCH_RATE]), pgain, igain, 0);
 		pid_set_gain(&(pids[PID_YAW_RATE]), pgain, igain, 0);
 
+		pid_set_gain(&(pids[PID_YAW]), 1, 0.05, 0);
+
 		if (igain < 0.0f)
 		{
 			pid_zero_integrator(&(pids[PID_ROLL_RATE]));
@@ -690,8 +692,8 @@ static void prvPWMTask( void *pvParameters )
 
 		if (pwm_check_if_valid(gpio_pulse_width_sum[CAP_YAW]))
 		{
-//			pids[PID_YAW].desired_val = pwm_to_control(gpio_pulse_width_sum[CAP_YAW]);
-			pids[PID_YAW_RATE].desired_val = pwm_to_control(gpio_pulse_width_sum[CAP_YAW])*mainANGLE_SCALE/80.0f;
+			pids[PID_YAW].desired_val = pwm_to_control(gpio_pulse_width_sum[CAP_YAW]);
+//			pids[PID_YAW_RATE].desired_val = pwm_to_control(gpio_pulse_width_sum[CAP_YAW])*mainANGLE_SCALE/80.0f;
 		}
 
 		if (pwm_check_if_valid(gpio_pulse_width_sum[CAP_ROLL]))
@@ -701,19 +703,19 @@ static void prvPWMTask( void *pvParameters )
 
 		if (pwm_check_if_valid(gpio_pulse_width_sum[CAP_PITCH]))
 		{
-			pids[PID_PITCH_RATE].desired_val = pwm_to_control(gpio_pulse_width_sum[CAP_PITCH])*mainANGLE_SCALE/80.0f;
+			pids[PID_PITCH_RATE].desired_val = -pwm_to_control(gpio_pulse_width_sum[CAP_PITCH])*mainANGLE_SCALE/80.0f;
 		}
 
 		// Roll rate PIDs
 //		pid_input(&pids[PID_ROLL], gyro_x_pos0/180.0f);
 //		pid_input(&pids[PID_PITCH], gyro_y_pos0/180.0f);
-//		pid_input(&pids[PID_YAW], gyro_z_pos0/180.0f);
+		pid_input(&pids[PID_YAW], gyro_z_pos0/180.0f);
 		//		pid_input(&pids[PID_YAW], (float)(gyro_z0)/(float)(0x7FFF));
 
 		// A positive angle needs a negative angular rate to correct
 //		pids[PID_ROLL_RATE].desired_val = pids[PID_ROLL].control;
 //		pids[PID_PITCH_RATE].desired_val = pids[PID_PITCH].control;
-//		pids[PID_YAW_RATE].desired_val = pids[PID_YAW].control;
+		pids[PID_YAW_RATE].desired_val = pids[PID_YAW].control;
 
 		pid_input(&pids[PID_ROLL_RATE], (float)(-gyro_y0)/(float)(0x7FFF));
 //		pid_input(&pids[PID_ROLL_RATE], (float)(0)/(float)(0x7FFF));

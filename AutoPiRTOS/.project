@@ -3,9 +3,8 @@
 	<name>AutoPiRTOS</name>
 	<comment></comment>
 	<projects>
-		<project>CMSISv1p30_LPC13xx</project>
+		<project>CMSIS_CORE_LPC13xx</project>
 		<project>FreeRTOS_Library</project>
-		<project>LPC13xx_Lib</project>
 	</projects>
 	<buildSpec>
 		<buildCommand>
